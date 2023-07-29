@@ -19,10 +19,9 @@ class OS_user{
         return db.collection('User').findOne({_id:new mongoDb.ObjectId(userId)});
     }
     async addToCart(prodId){
-        const db=database.getDb();
         try{
             const product=await Product.findByPk(prodId);
-            console.log(this.cart);
+            // console.log(this.cart);
             const productIndex=this.cart.items.findIndex(item=>item.productId.toString()==product._id.toString());
             let newQuantity=1;
             let updated_cart=[...this.cart.items];
@@ -42,6 +41,35 @@ class OS_user{
             console.log(err);
         }
 
+    }
+
+    async getCart(){
+        const productIds=this.cart.items.map(i=>{
+            return i.productId;
+        })
+        try{
+            const db=database.getDb();
+
+            const products=await db.collection('Product').find({_id:{$in:productIds}}).toArray();
+            const requiredProductData=products.map(i=>{
+                return {
+                    productId:i._id,
+                    title:i.title,
+                    quantity:this.cart.items.find(cart_i=>cart_i.productId.toString()==i._id.toString()).quantity
+                };
+            })
+            return new Promise(res=>res(requiredProductData));
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+
+    deleteCartItem(prodId){
+        let updated_cart=this.cart.items.filter(i=>i.productId.toString()!=prodId.toString());
+        updated_cart={items:updated_cart};
+        const db=database.getDb();
+        return db.collection('User').updateOne({_id:this._id},{$set:{cart:updated_cart}});
     }
 }
 
