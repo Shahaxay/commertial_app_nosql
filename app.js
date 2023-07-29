@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
-// const shopRoutes = require('./routes/shop');
+const shopRoutes = require('./routes/shop');
 const database = require('./util/database');
 
 
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/admin', adminRoutes); 
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 // app.use(errorController.get404);
 
