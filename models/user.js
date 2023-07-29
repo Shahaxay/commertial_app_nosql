@@ -1,11 +1,14 @@
 const mongoDb=require('mongodb');
 
 const database=require('../util/database');
+const Product=require('../models/product');
 
 class OS_user{
-    constructor(name,email){
+    constructor(name,email,cart,id){
         this.name=name,
-        this.email=email
+        this.email=email,
+        this.cart=cart,
+        this._id=id?new mongoDb.ObjectId(id):null;
     }
     save(){
         const db=database.getDb();
@@ -14,6 +17,31 @@ class OS_user{
     static findUserByID(userId){
         const db=database.getDb();
         return db.collection('User').findOne({_id:new mongoDb.ObjectId(userId)});
+    }
+    async addToCart(prodId){
+        const db=database.getDb();
+        try{
+            const product=await Product.findByPk(prodId);
+            console.log(this.cart);
+            const productIndex=this.cart.items.findIndex(item=>item.productId.toString()==product._id.toString());
+            let newQuantity=1;
+            let updated_cart=[...this.cart.items];
+            if(productIndex>=0){
+                //increase the quantity count
+                newQuantity=this.cart.items[productIndex].quantity+1;
+                updated_cart[productIndex].quantity=newQuantity;
+            }else{
+                //insert the product into cart with quantity 1
+                updated_cart.push({productId:product._id,quantity:newQuantity});
+            }
+            updated_cart={items:updated_cart};
+            const db=database.getDb();
+            return db.collection('User').updateOne({_id:this._id},{$set:{cart:updated_cart}});
+        }
+        catch(err){
+            console.log(err);
+        }
+
     }
 }
 
