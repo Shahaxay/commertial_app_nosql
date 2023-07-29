@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const errorController = require('./controllers/error');
+const User=require('./models/user');
 
 const app = express();
 
@@ -19,15 +20,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //adding user for each request through middleware through which request always funneled through
-app.use((req, res, next) => {
-    // User.findByPk(1)
-    // .then(user=>{
-    //     //inserting sequelize object so we can perform all function of sequelize method later
-    //     req.user=user;
-    //     next();
-    // })
-    // .catch(err=>console.log(err));
-    next();
+app.use(async(req, res, next) => {
+    try{
+        const user=await User.findUserByID('64c4eafc69810df084ed6dc5');
+        req.user=user._id;
+        next();
+        
+    }
+    catch(err){
+        console.log(err);
+    }
 })
 
 app.use('/admin', adminRoutes); 

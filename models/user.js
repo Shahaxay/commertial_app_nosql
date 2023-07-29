@@ -1,22 +1,20 @@
-const Sequelize=require('sequelize');
+const mongoDb=require('mongodb');
 
-const sequelize=require('../util/database');
+const database=require('../util/database');
 
-const OS_user=sequelize.define("shopping_user",{
-    id:{
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    name:{
-        type:Sequelize.STRING,
-        allowNull:false
-    },
-    email:{
-        type:Sequelize.STRING,
-        allowNull:false
+class OS_user{
+    constructor(name,email){
+        this.name=name,
+        this.email=email
     }
-});
+    save(){
+        const db=database.getDb();
+        return db.collection('User').insertOne(this);
+    }
+    static findUserByID(userId){
+        const db=database.getDb();
+        return db.collection('User').findOne({_id:new mongoDb.ObjectId(userId)});
+    }
+}
 
 module.exports=OS_user;
