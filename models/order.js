@@ -1,15 +1,20 @@
-const Sequelize=require('sequelize');
+const database=require('../util/database');
 
-const sequelize=require('../util/database');
-
-const Order=sequelize.define("order",{
-    id:{
-        type:Sequelize.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-        autoIncrement:true
-        
+class Order{
+    constructor(orderItems,userId){
+        this.orderItems=orderItems,
+        this.userId=userId
     }
-});
+    save(){
+        const db=database.getDb();
+        return db.collection('Order').insertOne(this);
+    }
+
+    // getOrder(){
+    //     //can have many order
+    //     //many items in each order
+
+    // }
+}
 
 module.exports=Order;

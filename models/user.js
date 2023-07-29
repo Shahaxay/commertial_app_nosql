@@ -39,8 +39,7 @@ class OS_user{
         }
         catch(err){
             console.log(err);
-        }
-
+        } 
     }
 
     async getCart(){
@@ -70,6 +69,32 @@ class OS_user{
         updated_cart={items:updated_cart};
         const db=database.getDb();
         return db.collection('User').updateOne({_id:this._id},{$set:{cart:updated_cart}});
+    }
+
+    async makeOrder(){
+        try{
+            const order={
+                orderItem:await this.getCart(),
+                user:{
+                    _id:new mongoDb.ObjectId(this._id),
+                    name:this.name   
+                }
+            }
+            //make the cart empty
+            this.cart={items:[]};
+            const db=database.getDb();
+            //update db
+            await db.collection('User').updateOne({_id:this._id},{$set:{cart:this.cart}});
+            return db.collection('Order').insertOne(order);
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+
+    getOrders(){
+        const db=database.getDb();
+        return db.collection('Order').find({'user._id':this._id}).toArray();
     }
 }
 
