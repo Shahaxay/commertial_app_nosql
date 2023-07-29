@@ -1,0 +1,23 @@
+<%- include('../includes/head.ejs') %>
+    </head>
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main>
+            <%if(orders.length<=0){%>
+                <h1>Nothing there!</h1>
+                <%}else{%>
+                    <%for(order of orders){%>
+                        <ul>
+                            <h1># <%=order.id%>
+                            </h1>
+                        </ul>
+                        <%order.products.forEach(item=>{%>
+                            <li><%=item.title%>(<%=item.orderItem.quantity%>)</li>
+                                <%})%>
+                    <%}%>
+                <%}%>
+
+        </main>
+<%- include('../includes/end.ejs') %>
+                                
+                                
